@@ -1,8 +1,7 @@
 import { ORPCError, os } from "@orpc/server";
+import type { OrpcContext } from "#@/lib/context/types";
 
-import type { Context } from "./context";
-
-export const o = os.$context<Context>();
+const o = os.$context<OrpcContext>();
 
 export const publicProcedure = o;
 
@@ -17,4 +16,11 @@ const requireAuth = o.middleware(async ({ context, next }) => {
   });
 });
 
-export const protectedProcedure = publicProcedure.use(requireAuth);
+export const protectedProcedure = publicProcedure.use(requireAuth).route({
+  spec: (spec) => {
+    return {
+      ...spec,
+      security: [{ authCookie: [] }],
+    };
+  },
+});

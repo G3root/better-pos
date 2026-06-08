@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { DashboardLayout } from "~/layouts/dashboard-layout";
 
-export const Route = createFileRoute("/_dashboard-layout")({
+export const Route = createFileRoute("/{-$locale}/_dashboard-layout")({
   component: RouteComponent,
 });
 

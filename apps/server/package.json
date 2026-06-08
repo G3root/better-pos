@@ -6,15 +6,18 @@
     "build": "tsdown",
     "check-types": "tsc -b",
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.mjs"
+    "dev": "pnpm dotenvx run -f ../../packages/env/.env -- node --import tsx --watch src/index.ts",
+    "start": "pnpm dotenvx run -f ../../packages/env/.env -- node .output/index.mjs"
   },
   "dependencies": {
     "@better-pos/api": "workspace:*",
     "@better-pos/auth": "workspace:*",
     "@better-pos/db": "workspace:*",
     "@better-pos/env": "workspace:*",
+    "@better-pos/logger": "workspace:*",
+    "@dotenvx/dotenvx": "catalog:",
     "@hono/node-server": "^1.14.4",
+    "@orpc/json-schema": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",

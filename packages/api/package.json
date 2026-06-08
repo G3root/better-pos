@@ -1,10 +1,10 @@
 {
   "name": "@better-pos/api",
   "type": "module",
+  "imports": {
+    "#@/*": "./src/*.ts"
+  },
   "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
     "./*": {
       "default": "./src/*.ts"
     }
@@ -14,10 +14,12 @@
     "@better-pos/auth": "workspace:*",
     "@better-pos/db": "workspace:*",
     "@better-pos/env": "workspace:*",
+    "@better-pos/logger": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
+    "@tanstack/react-start": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },

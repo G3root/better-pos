@@ -1,56 +1,159 @@
-import { createContext } from "@better-pos/api/context";
+import { createContext } from "@better-pos/api/lib/context/hono/create-context";
 import { appRouter } from "@better-pos/api/routers/index";
 import { auth } from "@better-pos/auth";
-import { env } from "@better-pos/env/server";
+import { ENV_SERVER } from "@better-pos/env/server";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
-import { onError } from "@orpc/server";
+import { onError, ORPCError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { initLogger } from "evlog";
-import { createAuthMiddleware, type BetterAuthInstance } from "evlog/better-auth";
-import { evlog, type EvlogVariables } from "evlog/hono";
+import { SmartCoercionPlugin } from "@orpc/json-schema";
+import { experimental_RethrowHandlerPlugin as RethrowHandlerPlugin } from "@orpc/server/plugins";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { serve } from "@hono/node-server";
+import { hostname } from "node:os";
+import {
+  honoLoggerMiddleware,
+  honoLogIngestionMiddleware,
+  type HonoLogVariables,
+} from "@better-pos/logger/server/hono/middleware";
 
-initLogger({
-  env: { service: "better-pos-server" },
-});
+import { log, parseError } from "@better-pos/logger/server";
 
-const identifyUser = createAuthMiddleware(auth as BetterAuthInstance, {
-  exclude: ["/api/auth/**"],
-  maskEmail: true,
-});
+import "./shared/lib/logger";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
+import { join } from "node:path";
 
-const app = new Hono<EvlogVariables>();
+const serverHostname = hostname();
 
-app.use(evlog());
-app.use("*", async (c, next) => {
-  await identifyUser(c.get("log"), c.req.raw.headers, c.req.path);
-  await next();
-});
+const app = new Hono<HonoLogVariables>();
 
 app.use(
   "/*",
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: ENV_SERVER.CORS_ORIGIN,
+    allowHeaders: ["Content-Type", "Authorization", "X-Request-Id"],
     allowMethods: ["GET", "POST", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
 
+app.use(
+  "/*",
+  honoLoggerMiddleware({
+    exclude: ["**/health/**", "**/_logs/ingest"],
+    enrich: (ctx) => {
+      ctx.event.hostname = serverHostname;
+    },
+  }),
+);
+
+app.post("/_logs/ingest", honoLogIngestionMiddleware());
+
+app.onError((error, c) => {
+  const requestLog = c.get("log");
+  if (requestLog) {
+    requestLog.error(error);
+  } else {
+    log.error({ event: "hono_global_error", error });
+  }
+
+  const parsed = parseError(error);
+
+  return c.json(
+    {
+      message: parsed.message,
+      ...(parsed.code ? { code: parsed.code } : {}),
+      ...(parsed.why ? { why: parsed.why } : {}),
+      ...(parsed.fix ? { fix: parsed.fix } : {}),
+      ...(parsed.link ? { link: parsed.link } : {}),
+    },
+    parsed.status as ContentfulStatusCode,
+  );
+});
+
+/**
+ * Disable /auth/reference calls as they are handled by the OpenAPI generator
+ * @see https://better-auth.com/docs/plugins/open-api#configuration
+ */
+app.on(["POST", "GET"], "/auth/reference", (c) =>
+  c.redirect(`${ENV_SERVER.VITE_SERVER_URL}/docs#auth-api-reference`, 301),
+);
+
+app.get("/auth/open-api/generate-schema", async (c) => {
+  // IMPORTANT: Need to explicitly do this instead of relying on the OpenAPI plugin's built-in schema generation
+  // Otherwise, it will 404 with the /auth/* endpoint
+  const schema = await auth.api.generateOpenAPISchema();
+  return c.json(schema);
+});
+
+app.on(["POST", "GET"], "/auth/*", async (c) => auth.handler(c.req.raw));
+
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
-  plugins: [
-    new OpenAPIReferencePlugin({
-      schemaConverters: [new ZodToJsonSchemaConverter()],
+  interceptors: [
+    onError((error, { context }) => {
+      context.logger.set({ handler: "openapi" });
+      context.logger.error(error instanceof Error ? error : String(error));
     }),
   ],
-  interceptors: [
-    onError((error) => {
-      console.error(error);
+  plugins: [
+    new SmartCoercionPlugin({
+      schemaConverters: [new ZodToJsonSchemaConverter()],
+    }),
+    new OpenAPIReferencePlugin({
+      docsConfig: () => {
+        const apiBasePath = new URL(ENV_SERVER.VITE_SERVER_URL).pathname;
+        return {
+          content: undefined,
+          metaData: {
+            description: "Documentation for the @better-pos/server API.",
+            title: "@better-pos/server API Documentation",
+          },
+          sources: [
+            {
+              title: "API Reference",
+              url: join(apiBasePath, "docs", "spec.json"),
+            },
+            {
+              title: "Auth API Reference",
+              url: join(apiBasePath, "auth", "open-api", "generate-schema"),
+            },
+          ],
+          theme: "deepSpace",
+        };
+      },
+      docsPath: "/docs",
+      schemaConverters: [new ZodToJsonSchemaConverter()],
+      specGenerateOptions: {
+        components: {
+          securitySchemes: {
+            authCookie: {
+              description: `**(optional)** Session cookie from signing-in, required for protected endpoints [View Auth Reference](${ENV_SERVER.VITE_SERVER_URL}/docs#auth-api-reference)`,
+              in: "cookie",
+              name: "better_auth.session_token",
+              type: "apiKey",
+            },
+          },
+        },
+        info: {
+          description: `This is the API for @better-pos/server.\n## Usage\nFor authentication, you can sign in via the \`/sign-in\` endpoint in [the Auth Reference](${ENV_SERVER.VITE_SERVER_URL}/docs#auth-api-reference). Include the session cookie in subsequent requests to access protected endpoints.\n## Resources\n - [Official Website](${ENV_SERVER.VITE_WEB_URL})\n - [Auth API Reference](${ENV_SERVER.VITE_SERVER_URL}/docs#auth-api-reference)`,
+          title: "@better-pos/server API",
+          version: ENV_SERVER.SOURCE_COMMIT,
+        },
+        servers: [
+          {
+            description: "Primary API Server",
+            url: ENV_SERVER.VITE_SERVER_URL,
+          },
+        ],
+      },
+      specPath: "/docs/spec.json",
+    }),
+    new RethrowHandlerPlugin({
+      filter: (error) => !(error instanceof ORPCError),
     }),
   ],
 });
@@ -64,34 +167,44 @@ export const rpcHandler = new RPCHandler(appRouter, {
 });
 
 app.use("/*", async (c, next) => {
-  const context = await createContext({ context: c });
+  const context = await createContext({ context: c, logger: c.get("log") });
 
+  // oRPC at /rpc/*
   const rpcResult = await rpcHandler.handle(c.req.raw, {
+    context,
     prefix: "/rpc",
-    context: context,
   });
 
   if (rpcResult.matched) {
     return c.newResponse(rpcResult.response.body, rpcResult.response);
   }
 
-  const apiResult = await apiHandler.handle(c.req.raw, {
-    prefix: "/api-reference",
-    context: context,
+  // OpenAPI docs at /docs/*
+  if (ENV_SERVER.ENABLE_OPEN_API_DOCS) {
+    const docsResult = await apiHandler.handle(c.req.raw, {
+      context,
+      prefix: "/docs",
+    });
+
+    if (docsResult.matched) {
+      return c.newResponse(docsResult.response.body, docsResult.response);
+    }
+  }
+
+  // OpenAPI REST API at /*
+  const openApiResult = await apiHandler.handle(c.req.raw, {
+    context,
   });
 
-  if (apiResult.matched) {
-    return c.newResponse(apiResult.response.body, apiResult.response);
+  if (openApiResult.matched) {
+    return c.newResponse(openApiResult.response.body, openApiResult.response);
   }
 
   await next();
 });
-
 app.get("/", (c) => {
   return c.text("OK");
 });
-
-import { serve } from "@hono/node-server";
 
 serve(
   {

@@ -9,85 +9,126 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DashboardLayoutRouteImport } from './routes/_dashboard-layout'
-import { Route as DashboardLayoutIndexRouteImport } from './routes/_dashboard-layout/index'
+import { Route as Char123LocaleChar125RouteRouteImport } from './routes/{-$locale}/route'
+import { Route as Char123LocaleChar125DashboardLayoutRouteImport } from './routes/{-$locale}/_dashboard-layout'
+import { Route as Char123LocaleChar125DashboardLayoutIndexRouteImport } from './routes/{-$locale}/_dashboard-layout/index'
 
-const DashboardLayoutRoute = DashboardLayoutRouteImport.update({
-  id: '/_dashboard-layout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardLayoutIndexRoute = DashboardLayoutIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardLayoutRoute,
-} as any)
+const Char123LocaleChar125RouteRoute =
+  Char123LocaleChar125RouteRouteImport.update({
+    id: '/{-$locale}',
+    path: '/{-$locale}',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char123LocaleChar125DashboardLayoutRoute =
+  Char123LocaleChar125DashboardLayoutRouteImport.update({
+    id: '/_dashboard-layout',
+    getParentRoute: () => Char123LocaleChar125RouteRoute,
+  } as any)
+const Char123LocaleChar125DashboardLayoutIndexRoute =
+  Char123LocaleChar125DashboardLayoutIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => Char123LocaleChar125DashboardLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof DashboardLayoutIndexRoute
+  '/{-$locale}': typeof Char123LocaleChar125RouteRouteWithChildren
+  '/{-$locale}/': typeof Char123LocaleChar125DashboardLayoutIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof DashboardLayoutIndexRoute
+  '/{-$locale}': typeof Char123LocaleChar125DashboardLayoutIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_dashboard-layout': typeof DashboardLayoutRouteWithChildren
-  '/_dashboard-layout/': typeof DashboardLayoutIndexRoute
+  '/{-$locale}': typeof Char123LocaleChar125RouteRouteWithChildren
+  '/{-$locale}/_dashboard-layout': typeof Char123LocaleChar125DashboardLayoutRouteWithChildren
+  '/{-$locale}/_dashboard-layout/': typeof Char123LocaleChar125DashboardLayoutIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/{-$locale}' | '/{-$locale}/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/_dashboard-layout' | '/_dashboard-layout/'
+  to: '/{-$locale}'
+  id:
+    | '__root__'
+    | '/{-$locale}'
+    | '/{-$locale}/_dashboard-layout'
+    | '/{-$locale}/_dashboard-layout/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
+  Char123LocaleChar125RouteRoute: typeof Char123LocaleChar125RouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_dashboard-layout': {
-      id: '/_dashboard-layout'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof DashboardLayoutRouteImport
+    '/{-$locale}': {
+      id: '/{-$locale}'
+      path: '/{-$locale}'
+      fullPath: '/{-$locale}'
+      preLoaderRoute: typeof Char123LocaleChar125RouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_dashboard-layout/': {
-      id: '/_dashboard-layout/'
+    '/{-$locale}/_dashboard-layout': {
+      id: '/{-$locale}/_dashboard-layout'
+      path: ''
+      fullPath: '/{-$locale}'
+      preLoaderRoute: typeof Char123LocaleChar125DashboardLayoutRouteImport
+      parentRoute: typeof Char123LocaleChar125RouteRoute
+    }
+    '/{-$locale}/_dashboard-layout/': {
+      id: '/{-$locale}/_dashboard-layout/'
       path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof DashboardLayoutIndexRouteImport
-      parentRoute: typeof DashboardLayoutRoute
+      fullPath: '/{-$locale}/'
+      preLoaderRoute: typeof Char123LocaleChar125DashboardLayoutIndexRouteImport
+      parentRoute: typeof Char123LocaleChar125DashboardLayoutRoute
     }
   }
 }
 
-interface DashboardLayoutRouteChildren {
-  DashboardLayoutIndexRoute: typeof DashboardLayoutIndexRoute
+interface Char123LocaleChar125DashboardLayoutRouteChildren {
+  Char123LocaleChar125DashboardLayoutIndexRoute: typeof Char123LocaleChar125DashboardLayoutIndexRoute
 }
 
-const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
-  DashboardLayoutIndexRoute: DashboardLayoutIndexRoute,
+const Char123LocaleChar125DashboardLayoutRouteChildren: Char123LocaleChar125DashboardLayoutRouteChildren =
+  {
+    Char123LocaleChar125DashboardLayoutIndexRoute:
+      Char123LocaleChar125DashboardLayoutIndexRoute,
+  }
+
+const Char123LocaleChar125DashboardLayoutRouteWithChildren =
+  Char123LocaleChar125DashboardLayoutRoute._addFileChildren(
+    Char123LocaleChar125DashboardLayoutRouteChildren,
+  )
+
+interface Char123LocaleChar125RouteRouteChildren {
+  Char123LocaleChar125DashboardLayoutRoute: typeof Char123LocaleChar125DashboardLayoutRouteWithChildren
 }
 
-const DashboardLayoutRouteWithChildren = DashboardLayoutRoute._addFileChildren(
-  DashboardLayoutRouteChildren,
-)
+const Char123LocaleChar125RouteRouteChildren: Char123LocaleChar125RouteRouteChildren =
+  {
+    Char123LocaleChar125DashboardLayoutRoute:
+      Char123LocaleChar125DashboardLayoutRouteWithChildren,
+  }
+
+const Char123LocaleChar125RouteRouteWithChildren =
+  Char123LocaleChar125RouteRoute._addFileChildren(
+    Char123LocaleChar125RouteRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
-  DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
+  Char123LocaleChar125RouteRoute: Char123LocaleChar125RouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }
