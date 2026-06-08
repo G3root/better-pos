@@ -108,7 +108,27 @@ export const organization = pgTable("organization", {
   slug: t.varchar("slug", { length: 255 }).notNull().unique(),
   logo: t.text("logo"),
   metadata: t.text("metadata"),
+
+  taxId: t.text("tax_id"),
+  website: t.text("website"),
+
+  currency: t.varchar("currency", { length: 3 }).notNull().default("USD"),
+  currencySymbol: t.varchar("currency_symbol", { length: 10 }).default("$"),
+  currencyPosition: t.varchar("currency_position", { length: 10 }).notNull().default("prefix"),
+  locale: t.varchar("locale", { length: 10 }).notNull().default("en-US"),
+  timezone: t.varchar("timezone", { length: 50 }).notNull().default("UTC"),
+
+  priceIncludesTax: t.boolean("price_includes_tax").default(false).notNull(),
+  roundingPrecision: t.integer("rounding_precision").default(2).notNull(),
+  allowDiscounts: t.boolean("allow_discounts").default(true).notNull(),
+  defaultLowStockThreshold: t.integer("default_low_stock_threshold").default(10).notNull(),
+
   createdAt: t.timestamp("created_at", { precision: 6, withTimezone: true }).notNull(),
+  updatedAt: t
+    .timestamp("updated_at", { precision: 6, withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
 });
 
 export const member = pgTable("member", {
