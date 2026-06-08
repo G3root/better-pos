@@ -20,8 +20,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@better-pos/ui/*": ["../../packages/ui/src/*"]
+      "~/*": ["./src/*"]
     }
   }
 }

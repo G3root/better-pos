@@ -20,8 +20,8 @@
     "db:watch": "turbo -F @better-pos/db db:watch",
     "db:stop": "turbo -F @better-pos/db db:stop",
     "db:down": "turbo -F @better-pos/db db:down",
-    "check": "ultracite check",
-    "fix": "ultracite fix"
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check"
   },
   "dependencies": {
     "@better-pos/env": "workspace:*",
