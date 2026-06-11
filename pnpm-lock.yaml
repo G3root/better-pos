@@ -250,6 +250,9 @@ importers:
       '@tanstack/react-start':
         specifier: 'catalog:'
         version: 1.168.18(crossws@0.4.5(srvx@0.10.1))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@tanstack/react-store':
+        specifier: ^0.11.0
+        version: 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       babel-plugin-react-compiler:
         specifier: 'catalog:'
         version: 1.0.0

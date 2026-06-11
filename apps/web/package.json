@@ -29,6 +29,7 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-ssr-query": "^1.166.11",
     "@tanstack/react-start": "catalog:",
+    "@tanstack/react-store": "^0.11.0",
     "babel-plugin-react-compiler": "catalog:",
     "better-auth": "catalog:",
     "class-variance-authority": "^0.7.1",
