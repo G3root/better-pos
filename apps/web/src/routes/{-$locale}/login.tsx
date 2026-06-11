@@ -1,8 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-
 import { authClient } from "~/lib/auth-client";
-
 import {
   Card,
   CardContent,
@@ -12,13 +10,15 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { useAppForm } from "~/hooks/form";
+import { useNavigate } from "@better-pos/i18n/tanstack-start/hooks/use-navigate";
+import { Link } from "@better-pos/i18n/tanstack-start/components/link";
 
 export const Route = createFileRoute("/{-$locale}/login")({
   component: LoginPage,
 });
 
 function LoginPage() {
-  const navigate = Route.useNavigate();
+  const navigate = useNavigate();
 
   const form = useAppForm({
     defaultValues: {
@@ -37,7 +37,8 @@ function LoginPage() {
       }
 
       toast.success("Signed in successfully");
-      await navigate({ to: "/{-$locale}" });
+
+      await navigate({ to: "" });
     },
   });
 
@@ -76,7 +77,7 @@ function LoginPage() {
         <CardFooter className="justify-center">
           <p className="text-xs text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link to="/{-$locale}/signup" className="text-primary underline">
+            <Link to="/signup" className="text-primary underline">
               Sign up
             </Link>
           </p>
