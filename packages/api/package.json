@@ -15,12 +15,14 @@
     "@better-pos/db": "workspace:*",
     "@better-pos/env": "workspace:*",
     "@better-pos/logger": "workspace:*",
+    "@better-pos/utils": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
     "@tanstack/react-start": "catalog:",
     "dotenv": "catalog:",
+    "drizzle-orm": "^0.45.1",
     "zod": "catalog:"
   },
   "devDependencies": {

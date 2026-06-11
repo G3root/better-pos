@@ -20,3 +20,11 @@ export const authStateCollection = createCollection(
     schema: authStateSchema,
   }),
 );
+
+export function getAuthState() {
+  const auth = authStateCollection.get("auth");
+  if (auth && auth.session && new Date(auth.session.expiresAt) > new Date()) {
+    return auth;
+  }
+  return null;
+}
