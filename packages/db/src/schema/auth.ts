@@ -18,6 +18,7 @@ export const user = pgTable("user", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  onBoardedOn: t.timestamp("onboarded_on", { precision: 6, withTimezone: true }),
 });
 
 export const session = pgTable(

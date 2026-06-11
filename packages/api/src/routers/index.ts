@@ -1,9 +1,9 @@
 import { type RouterClient } from "@orpc/server";
 
-import { privateRouter } from "#@/routers/private/index";
+import { organizationRouter } from "#@/domains/organization/index";
 
 export const appRouter = {
-  private: privateRouter,
+  organization: organizationRouter,
 };
 
 export type AppRouter = typeof appRouter;
