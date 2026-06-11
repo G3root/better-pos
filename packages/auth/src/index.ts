@@ -18,6 +18,8 @@ export function createAuth() {
     trustedOrigins: [ENV_SERVER.CORS_ORIGIN],
     emailAndPassword: {
       enabled: true,
+      autoSignIn: true,
+      requireEmailVerification: false,
     },
     secret: ENV_SERVER.BETTER_AUTH_SECRET,
     baseURL: new URL(ENV_SERVER.VITE_SERVER_URL).origin,

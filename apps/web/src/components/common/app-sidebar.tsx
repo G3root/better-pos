@@ -9,8 +9,11 @@ import {
   CreditCard,
   Tag,
   LifeBuoy,
+  LogOut,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { authClient } from "~/lib/auth-client";
+import { toast } from "sonner";
 
 import {
   Sidebar,
@@ -128,6 +131,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton tooltip="Support" render={<Link to="/support" />}>
               <LifeBuoy />
               <span>Support</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip="Sign out"
+              onClick={async () => {
+                await authClient.signOut();
+                toast.success("Signed out successfully");
+                window.location.href = "/login";
+              }}
+            >
+              <LogOut />
+              <span>Sign out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
