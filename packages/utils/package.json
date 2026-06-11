@@ -1,0 +1,21 @@
+{
+  "name": "@better-pos/utils",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#@/*": "./src/*.ts"
+  },
+  "exports": {
+    "./id": "./src/id.ts",
+    "./url": "./src/url.ts"
+  },
+  "dependencies": {
+    "@sindresorhus/slugify": "^3.0.0",
+    "legid": "^0.1.4"
+  },
+  "devDependencies": {
+    "@better-pos/config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}
