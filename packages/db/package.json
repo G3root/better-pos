@@ -5,7 +5,16 @@
     ".": {
       "default": "./src/index.ts"
     },
+    "./zod-schema": {
+      "types": "./src/zod-schema.ts",
+      "default": "./src/zod-schema.ts"
+    },
+    "./schema": {
+      "types": "./src/schema/index.ts",
+      "default": "./src/schema/index.ts"
+    },
     "./*": {
+      "types": "./src/*.ts",
       "default": "./src/*.ts"
     }
   },
@@ -23,6 +32,7 @@
     "@better-pos/env": "workspace:*",
     "dotenv": "catalog:",
     "drizzle-orm": "^0.45.1",
+    "drizzle-zod": "^0.8.3",
     "pg": "^8.17.1",
     "zod": "catalog:"
   },
